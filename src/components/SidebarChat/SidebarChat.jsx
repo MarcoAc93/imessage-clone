@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import * as timeago from 'timeago.js';
 import { Avatar } from '@material-ui/core';
 import * as Actions from '../../actions/chat';
 import db from '../../firebase';
@@ -26,7 +27,7 @@ const SidebarChat = ({ id, chatName, selectChat }) => {
       <div className="sidebar-chat__info">
         <h3>{chatName}</h3>
         <p>{chatInfo[0]?.message}</p>
-        <small>{new Date(chatInfo[0]?.timestamp?.toDate()).toLocaleString()}</small>
+        <small>{timeago.format(new Date(chatInfo[0]?.timestamp?.toDate()))}</small>
       </div>
     </div>
   );

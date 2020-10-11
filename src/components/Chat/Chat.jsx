@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import { IconButton } from '@material-ui/core';
 import { MicNone } from '@material-ui/icons';
+import FlipMove from 'react-flip-move';
 import firebase from 'firebase';
 import db from '../../firebase';
 
@@ -12,11 +13,18 @@ import './styles.css';
 const Chat = ({ chat, user }) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(scrollToBottom, [messages]);
 
   useEffect(() => {
     if (chat.chatId) {
       db.collection('chats').doc(chat.chatId)
-        .collection('messages').orderBy('timestamp', 'desc')
+        .collection('messages').orderBy('timestamp', 'asc')
         .onSnapshot(snapshot => {
           setMessages(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))
         });
@@ -49,7 +57,12 @@ const Chat = ({ chat, user }) => {
 
       {/* Chat Messages */}
       <div className="chat__messages">
-        {messages.map(message => <Message key={message.id} contents={message.data} user={user} />)}
+        <FlipMove>
+          {messages.map(message => (
+            <Message key={message.id} contents={message.data} user={user} />
+          ))}
+        </FlipMove>
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Chat Input */}
